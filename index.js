@@ -3,12 +3,17 @@ var Factory = require('factory-girl'),
 
 var SequelizeAdapter = function() {};
 SequelizeAdapter.prototype = new Adapter();
+SequelizeAdapter.prototype.build = function(Model, props) {
+  return Model.build(props);
+};
 SequelizeAdapter.prototype.create = function(Model, props) {
   return Model.build(props);
 };
 SequelizeAdapter.prototype.save = function(doc, Model, cb) {
   doc.save()
-    .success(cb)
+    .success(function(model) {
+      cb();
+    })
     .error(function(event) {
       var err = new Error('Failed to save fixture');
       err.event = event;
@@ -37,3 +42,5 @@ module.exports = function(models) {
     Factory.setAdapter(adapter);
   }
 };
+
+module.exports.SequelizeAdapter = SequelizeAdapter;
